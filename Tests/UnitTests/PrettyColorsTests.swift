@@ -357,12 +357,19 @@ class PrettyColorsTests: XCTestCase {
 			Color.Wrap(foreground: .red),
 			Color.Wrap(foreground: 114)
 		] {
-			for (number, style·wrap): (UInt8, Color.Wrap) in (
-			(1 as UInt8 ... 55).compactMap /* more accurately, concatenate optionals */ {
-					guard let style = StyleParameter(rawValue: $0) else { return nil }
-					return ($0 as UInt8, [style] as Color.Wrap)
-				}
-			) {
+			let numbersAndStyles: [(UInt8, Color.Wrap)]
+			#if !swift(>=3.3) || (swift(>=4) && !swift(>=4.1))
+			numbersAndStyles = (1 as UInt8 ... 55).flatMap /* more accurately, concatenate optionals */ {
+				guard let style = StyleParameter(rawValue: $0) else { return nil }
+				return ($0 as UInt8, [style] as Color.Wrap)
+			}
+			#else
+			numbersAndStyles = (1 as UInt8 ... 55).compactMap /* more accurately, concatenate optionals */ {
+				guard let style = StyleParameter(rawValue: $0) else { return nil }
+				return ($0 as UInt8, [style] as Color.Wrap)
+			}
+			#endif
+			for (number, style·wrap): (UInt8, Color.Wrap) in numbersAndStyles {
 				let formatted·number = NSString(format: "%02d", number).appending("")
 
 				for (appended·wrap, suffix) in [
