@@ -34,12 +34,21 @@ public struct Wrap: SelectGraphicRenditionWrapType {
 		background: Color.Named.Color? = nil,
 		style: StyleParameter...
 	) {
+		#if !swift(>=3.3) || (swift(>=4) && !swift(>=4.1))
+		let colors: [Parameter] = [
+			foreground.map { Color.Named(foreground: $0) },
+			background.map { Color.Named(background: $0) }
+		].flatMap { $0 } // concatenate non-nil ColorType parameters
+		
+		self.init(parameters: colors + style.map { $0 as Parameter })
+		#else
 		let colors: [Parameter] = [
 			foreground.map { Color.Named(foreground: $0) },
 			background.map { Color.Named(background: $0) }
 		].compactMap { $0 } // concatenate non-nil ColorType parameters
 		
-		self.init(parameters: colors + style.map { $0 as Parameter })
+        	self.init(parameters: colors + style.map { $0 as Parameter })
+		#endif
 	}
 	
 	public init(
@@ -47,12 +56,21 @@ public struct Wrap: SelectGraphicRenditionWrapType {
 		background: UInt8? = nil,
 		style: StyleParameter...
 	) {
+		#if !swift(>=3.3) || (swift(>=4) && !swift(>=4.1))
+		let colors: [Parameter] = [
+			foreground.map { Color.EightBit(foreground: $0) },
+			background.map { Color.EightBit(background: $0) }
+		].flatMap { $0 } // concatenate non-nil ColorType parameters
+		
+		self.init(parameters: colors + style.map { $0 as Parameter })
+		#else
 		let colors: [Parameter] = [
 			foreground.map { Color.EightBit(foreground: $0) },
 			background.map { Color.EightBit(background: $0) }
 		].compactMap { $0 } // concatenate non-nil ColorType parameters
 		
-		self.init(parameters: colors + style.map { $0 as Parameter })
+        	self.init(parameters: colors + style.map { $0 as Parameter })
+		#endif
 	}
 	
 	public init(styles: StyleParameter...) {
@@ -121,9 +139,15 @@ public struct Wrap: SelectGraphicRenditionWrapType {
 			return self.filter(level: .foreground).first
 		}
 		mutating set(newForeground) {
+			#if !swift(>=3.3) || (swift(>=4) && !swift(>=4.1))
+			self.parameters =
+				[newForeground].flatMap { $0 } + // Empty array or array containing new foreground
+				self.filter(level: .foreground, inverse: true) // All non-foreground parameters
+			#else
 			self.parameters =
 				[newForeground].compactMap { $0 } + // Empty array or array containing new foreground
 				self.filter(level: .foreground, inverse: true) // All non-foreground parameters
+			#endif
 		}
 	}
 	
@@ -132,9 +156,15 @@ public struct Wrap: SelectGraphicRenditionWrapType {
 			return self.filter(level: .background).first
 		}
 		mutating set(newBackground) {
+			#if !swift(>=3.3) || (swift(>=4) && !swift(>=4.1))
+			self.parameters =
+				[newBackground].flatMap { $0 } + // Empty array or array containing new background
+				self.filter(level: .background, inverse: true) // All non-background parameters
+			#else
 			self.parameters =
 				[newBackground].compactMap { $0 } + // Empty array or array containing new background
 				self.filter(level: .background, inverse: true) // All non-background parameters
+			#endif
 		}
 	}
 
