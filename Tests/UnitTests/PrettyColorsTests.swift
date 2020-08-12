@@ -358,7 +358,7 @@ class PrettyColorsTests: XCTestCase {
 			Color.Wrap(foreground: 114)
 		] {
 			for (number, style·wrap): (UInt8, Color.Wrap) in (
-                (1 as UInt8 ... 55).compactMap /* more accurately, concatenate optionals */ {
+			(1 as UInt8 ... 55).compactMap /* more accurately, concatenate optionals */ {
 					guard let style = StyleParameter(rawValue: $0) else { return nil }
 					return ($0 as UInt8, [style] as Color.Wrap)
 				}
